@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <bundle id="FLASEclipse" version="1.0.0.qualifier">
+      <category name="flas"/>
+   </bundle>
+   <category-def name="flas" label="FLAS">
+      <description>
+         FLAS language support
+      </description>
+   </category-def>
+</site>

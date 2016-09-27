@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="createProject"
+         point="org.eclipse.ui.newWizards">
+         <wizard
+         	id="newFLASProjectWizard"
+         	name="Create new FLAS Project"
+         	category="flas"
+         	class="org.flasck.eclipse.project.NewWizard"
+         	project="true">
+         </wizard>
+   </extension>
+   <extension
+         id="flasNature"
+         point="org.eclipse.core.resources.natures">
+         <runtime>
+            <run class='org.flasck.eclipse.nature.FLASNature'>
+			</run>
+         </runtime>
+   </extension>
+
+</plugin>
