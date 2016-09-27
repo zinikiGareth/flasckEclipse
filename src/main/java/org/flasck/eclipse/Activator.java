@@ -9,7 +9,9 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "FLASEclipse"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.flasck.eclipse"; //$NON-NLS-1$
+	public static final String NATURE_ID = PLUGIN_ID+".flasNature";
+	public static final String BUILDER_ID = PLUGIN_ID+".flasBuilder";
 
 	// The shared instance
 	private static Activator plugin;

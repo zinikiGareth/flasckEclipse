@@ -26,6 +26,7 @@ import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+import org.flasck.eclipse.Activator;
 
 @SuppressWarnings("restriction")
 public class NewWizard extends BasicNewResourceWizard {
@@ -62,6 +63,17 @@ public class NewWizard extends BasicNewResourceWizard {
 	public boolean performFinish() {
 		createNewProject();
 		selectAndReveal(newProject);
+		try {
+			IProjectDescription pd = newProject.getDescription();
+
+			String[] newNatures = new String[] { Activator.NATURE_ID };
+			pd.setNatureIds(newNatures);
+//			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+//			IStatus stat = workspace.validateNatureSet(newNatures);
+			newProject.setDescription(pd, null);
+		} catch (CoreException ex) {
+			ex.printStackTrace();
+		}
 		return true;
 	}
 
@@ -123,16 +135,16 @@ public class NewWizard extends BasicNewResourceWizard {
 							.getStatus().getSeverity(),
 							ResourceMessages.NewProject_errorMessage, cause));
 				}
-				status.setProperty(StatusAdapter.TITLE_PROPERTY,
-						ResourceMessages.NewProject_errorMessage);
+//				status.setProperty(StatusAdapter.TITLE_PROPERTY,
+//						ResourceMessages.NewProject_errorMessage);
 				StatusManager.getManager().handle(status, StatusManager.BLOCK);
 			} else {
 				StatusAdapter status = new StatusAdapter(new Status(
 						IStatus.WARNING, IDEWorkbenchPlugin.IDE_WORKBENCH, 0,
 						NLS.bind(ResourceMessages.NewProject_internalError,
 								t.getMessage()), t));
-				status.setProperty(StatusAdapter.TITLE_PROPERTY,
-						ResourceMessages.NewProject_errorMessage);
+//				status.setProperty(StatusAdapter.TITLE_PROPERTY,
+//						ResourceMessages.NewProject_errorMessage);
 				StatusManager.getManager().handle(status,
 						StatusManager.LOG | StatusManager.BLOCK);
 			}
@@ -140,24 +152,6 @@ public class NewWizard extends BasicNewResourceWizard {
 		}
 		newProject = proj;
 		
-		try {
-			IProjectDescription pd = proj.getDescription();
-
-			String[] newNatures = new String[] { "org.flasck.eclipse.flasNature" };
-			description.setNatureIds(newNatures);
-			IStatus stat = workspace.validateNatureSet(newNatures);
-			System.out.println("nature stat = " + stat);
-			proj.setDescription(pd, null);
-			
-			if (pd.getNatureIds() == null) {
-				System.out.println("No natures");
-			} else
-				for (String s : pd.getNatureIds()) {
-					System.out.println("Nature " + s);
-				}
-		} catch (CoreException ex) {
-			ex.printStackTrace();
-		}
 		return newProject;
 	}
 	

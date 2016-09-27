@@ -7,11 +7,12 @@
          <wizard
          	id="newFLASProjectWizard"
          	name="Create new FLAS Project"
-         	category="flas"
+         	category="org.flasck.eclipse.flas"
          	class="org.flasck.eclipse.project.NewWizard"
          	project="true">
          </wizard>
    </extension>
+
    <extension
          id="flasNature"
          point="org.eclipse.core.resources.natures">
@@ -19,6 +20,15 @@
             <run class='org.flasck.eclipse.nature.FLASNature'>
 			</run>
          </runtime>
+   		 <builder id="org.flasck.eclipse.flasBuilder"/>
    </extension>
 
+   <extension
+         id="flasBuilder"
+         name="FLAS Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder hasNature='true' callOnEmptyDelta='true'>
+            <run class="org.flasck.eclipse.builder.FLASBuilder"></run>
+      </builder>
+   </extension>
 </plugin>
