@@ -1,16 +1,16 @@
 package org.flasck.eclipse.builder;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 public class FLASDeltaVisitor implements IResourceDeltaVisitor {
-	final Set<File> inputs = new HashSet<File>();
+	final Set<IFolder> inputs = new HashSet<IFolder>();
 
 	@Override
 	public boolean visit(IResourceDelta delta) throws CoreException {
@@ -23,7 +23,7 @@ public class FLASDeltaVisitor implements IResourceDeltaVisitor {
 		}
 		
 		if (resource.getName().endsWith(".fl"))
-			inputs.add(resource.getLocation().toFile().getParentFile());
+			inputs.add((IFolder) resource.getParent());
 		
 		return false;
 	}
