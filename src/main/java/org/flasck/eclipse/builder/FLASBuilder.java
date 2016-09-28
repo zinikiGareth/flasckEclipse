@@ -79,7 +79,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 	}
 
 	private void build(Compiler compiler, IFolder f) {
-		File dir = f.getLocation().toFile().getParentFile();
+		File dir = f.getLocation().toFile();
 		try {
 			try {
 				f.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
