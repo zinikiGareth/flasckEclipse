@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceStatus;
@@ -71,6 +72,18 @@ public class NewWizard extends BasicNewResourceWizard {
 //			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 //			IStatus stat = workspace.validateNatureSet(newNatures);
 			newProject.setDescription(pd, null);
+			IFolder s = newProject.getFolder("src");
+			s.create(false, true, null);
+			IFolder sm = s.getFolder("main");
+			sm.create(false, true, null);
+			IFolder smf = sm.getFolder("flas");
+			smf.create(false, true, null);
+			IFolder flim = newProject.getFolder("flim");
+			flim.create(false, true, null);
+			IFolder jso = newProject.getFolder("jsout");
+			jso.create(false, true, null);
+			IFolder dgo = newProject.getFolder("droidout");
+			dgo.create(false, true, null);
 		} catch (CoreException ex) {
 			ex.printStackTrace();
 		}

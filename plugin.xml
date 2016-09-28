@@ -27,7 +27,7 @@
          id="flasBuilder"
          name="FLAS Builder"
          point="org.eclipse.core.resources.builders">
-      <builder hasNature='true' callOnEmptyDelta='true'>
+      <builder hasNature='true' callOnEmptyDelta='false'>
             <run class="org.flasck.eclipse.builder.FLASBuilder"></run>
       </builder>
    </extension>
