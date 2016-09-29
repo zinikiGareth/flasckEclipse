@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 
 public class FLASDeltaVisitor implements IResourceDeltaVisitor {
 	final Set<IFolder> inputs = new HashSet<IFolder>();
+	boolean reloadSettings;
 
 	@Override
 	public boolean visit(IResourceDelta delta) throws CoreException {
@@ -22,6 +23,8 @@ public class FLASDeltaVisitor implements IResourceDeltaVisitor {
 			return true;
 		}
 		
+		if (resource.getName().equals("settings.xml") && resource.getParent() == resource.getProject())
+			reloadSettings = true;
 		if (resource.getName().endsWith(".fl"))
 			inputs.add((IFolder) resource.getParent());
 		

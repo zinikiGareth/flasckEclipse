@@ -84,6 +84,8 @@ public class NewWizard extends BasicNewResourceWizard {
 			jso.create(false, true, null);
 			IFolder dgo = newProject.getFolder("droidout");
 			dgo.create(false, true, null);
+			
+			// TODO: also create outline 'settings.xml' file
 		} catch (CoreException ex) {
 			ex.printStackTrace();
 		}

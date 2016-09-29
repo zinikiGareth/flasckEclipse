@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -22,15 +23,22 @@ import org.flasck.flas.errors.ErrorResult;
 import org.flasck.flas.errors.ErrorResultException;
 import org.flasck.flas.errors.FLASError;
 import org.zinutils.utils.FileUtils;
+import org.zinutils.xml.XML;
+import org.zinutils.xml.XMLElement;
 
 public class FLASBuilder extends IncrementalProjectBuilder {
-	
+	private String jsout;
+	private String droid;
+	private String flim;
+	private Set<String> refs = new TreeSet<String>();
+
 	public FLASBuilder() {
 	}
 	
 	@Override
 	protected void startupOnInitialize() {
 		super.startupOnInitialize();
+		parseSettingsFile();
 	}
 
 	@Override
@@ -38,6 +46,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		Set<IFolder> inputs = null;
 		switch (kind) {
 		case FULL_BUILD: {
+			parseSettingsFile();
 			inputs = new HashSet<IFolder>();
 			for (IResource r : getProject().members(IResource.FILE)) {
 				if (r.getName().endsWith(".fl"))
@@ -51,6 +60,8 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 			FLASDeltaVisitor analyzer = new FLASDeltaVisitor();
 			delta.accept(analyzer);
 			inputs = analyzer.inputs;
+			if (analyzer.reloadSettings)
+				parseSettingsFile();
 			break;
 		}
 		case CLEAN_BUILD:
@@ -58,7 +69,6 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 			System.out.println("How to handle build kind " + kind);
 			break;
 		}
-		
 		if (inputs != null) {
 			Compiler compiler = getConfiguredCompiler();
 			for (IFolder f : inputs)
@@ -71,10 +81,41 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
+	private void parseSettingsFile() {
+		// clean up what we had before so they can remove entries
+		jsout = null;
+		flim = null;
+		refs.clear();
+		
+		// read the file
+		XML sf = XML.fromFile(getProject().getFile("settings.xml").getLocation().toFile());
+		for (XMLElement xe : sf.elementChildren()) {
+			if (xe.hasTag("Source")) {
+				// we are currently ignoring this and just going with "everything is source if it ends in .fl"
+			} else if (xe.hasTag("JavaScript")) {
+				jsout = xe.get("dir");
+			} else if (xe.hasTag("Android")) {
+				droid = xe.get("dir");
+			} else if (xe.hasTag("Flim")) {
+				flim = xe.get("dir");
+			} else if (xe.hasTag("Reference")) {
+				refs.add(xe.get("dir"));
+			} else
+				System.err.println("Cannot handle XE: " + xe.serialize());
+		}
+	}
+
 	protected Compiler getConfiguredCompiler() {
 		Compiler ret = new Compiler();
-		ret.writeFlimTo(getProject().getFolder("flim").getLocation().toFile());
-		ret.writeJSTo(getProject().getFolder("jsout").getLocation().toFile());
+		if (flim != null)
+			ret.writeFlimTo(getProject().getFolder(flim).getLocation().toFile());
+		if (jsout != null)
+			ret.writeJSTo(getProject().getFolder(jsout).getLocation().toFile());
+		if (droid != null)
+			ret.writeDroidTo(getProject().getFolder(droid).getLocation().toFile());
+		for (String s : refs) {
+			ret.searchIn(new File(s));
+		}
 		return ret;
 	}
 
