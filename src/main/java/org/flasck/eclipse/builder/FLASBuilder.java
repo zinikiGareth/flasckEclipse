@@ -131,34 +131,38 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 					er.showTo(new PrintWriter(System.err), 4);
 					for (int i=0;i<er.count();i++) {
 						FLASError err = er.get(i);
-						IResource ef = f.getFile(err.loc.file);
+						if (err == null)
+							continue;
+						IResource ef = err.loc != null ? f.getFile(err.loc.file) : null;
 						if (ef == null)
-							ef = getProject();
+							ef = f;
 						
 						// Create the marker in the problems window
 						IMarker m = ef.createMarker(IMarker.PROBLEM);
 						m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 						m.setAttribute(IMarker.MESSAGE, err.msg);
-						m.setAttribute(IMarker.LINE_NUMBER, err.loc.lineNo);
+						if (err.loc != null) {
+							m.setAttribute(IMarker.LINE_NUMBER, err.loc.lineNo);
 						
-						// find out where it actually is ...
-						if (ef instanceof IFile) {
-							Document doc = new Document(new String(FileUtils.readAllStream(((IFile)ef).getContents())));
-							int start = doc.getLineOffset(err.loc.lineNo-1);
-							int len = doc.getLineLength(err.loc.lineNo-1);
-							String offline = doc.get(start, len);
-							int k = 0;
-							while (k<len && Character.isWhitespace(offline.charAt(k)))
-								k++;
-							k += err.loc.off;
-							// This shouldn't happen, but just in case, step over any whitespace at the official start point
-							while (k<len && Character.isWhitespace(offline.charAt(k)))
-								k++;
-							if (k < len) {
-								m.setAttribute(IMarker.CHAR_START, start+k);
-								while (k < len && !Character.isWhitespace(offline.charAt(k)))
+							// find out where it actually is ...
+							if (ef instanceof IFile) {
+								Document doc = new Document(new String(FileUtils.readAllStream(((IFile)ef).getContents())));
+								int start = doc.getLineOffset(err.loc.lineNo-1);
+								int len = doc.getLineLength(err.loc.lineNo-1);
+								String offline = doc.get(start, len);
+								int k = 0;
+								while (k<len && Character.isWhitespace(offline.charAt(k)))
 									k++;
-								m.setAttribute(IMarker.CHAR_END, start+k);
+								k += err.loc.off;
+								// This shouldn't happen, but just in case, step over any whitespace at the official start point
+								while (k<len && Character.isWhitespace(offline.charAt(k)))
+									k++;
+								if (k < len) {
+									m.setAttribute(IMarker.CHAR_START, start+k);
+									while (k < len && !Character.isWhitespace(offline.charAt(k)))
+										k++;
+									m.setAttribute(IMarker.CHAR_END, start+k);
+								}
 							}
 						}
 					}
@@ -167,7 +171,15 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 				}
 			}
 		} catch (Exception ex) {
+			System.err.println("Caught exception " + ex);
 			ex.printStackTrace();
+			try {
+				IMarker m = f.createMarker(IMarker.PROBLEM);
+				m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+				m.setAttribute(IMarker.MESSAGE, "Internal Error: " + ex.toString());
+			} catch (CoreException e2) {
+				e2.printStackTrace();
+			}
 		}
 	}
 
