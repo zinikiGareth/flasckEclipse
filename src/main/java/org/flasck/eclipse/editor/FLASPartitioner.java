@@ -1,18 +1,47 @@
 package org.flasck.eclipse.editor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
-import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedRegion;
+import org.flasck.flas.Compiler;
+import org.flasck.flas.blockForm.InputPosition;
+import org.flasck.flas.errors.ErrorResultException;
+import org.flasck.flas.parsedForm.CardDefinition;
+import org.flasck.flas.parsedForm.ContractImplements;
+import org.flasck.flas.parsedForm.EventCaseDefn;
+import org.flasck.flas.parsedForm.EventHandlerDefinition;
+import org.flasck.flas.parsedForm.HandlerImplements;
+import org.flasck.flas.parsedForm.PackageDefn;
+import org.flasck.flas.parsedForm.Scope;
+import org.flasck.flas.parsedForm.Scope.ScopeEntry;
 
 public class FLASPartitioner implements IDocumentPartitioner {
+	public class TRComparator implements Comparator<ITypedRegion> {
+		@Override
+		public int compare(ITypedRegion o1, ITypedRegion o2) {
+			if (o1.getOffset() < o2.getOffset())
+				return -1;
+			else if (o1.getOffset() > o2.getOffset())
+				return 1;
+			if (o1.getLength() > o2.getLength())
+				return -1;
+			else if (o1.getLength() < o2.getLength())
+				return 1;
+			return 0;
+		}
+	}
+
 	private IDocument document;
+	private ITypedRegion[] partitions;
 
 	@Override
 	public void connect(IDocument document) {
@@ -28,12 +57,12 @@ public class FLASPartitioner implements IDocumentPartitioner {
 
 	@Override
 	public void documentAboutToBeChanged(DocumentEvent event) {
-		System.out.println("aboutToChange " + event);
+		System.out.println("aboutToChange " + event.getOffset());
 	}
 
 	@Override
 	public boolean documentChanged(DocumentEvent event) {
-		System.out.println("changed " + event);
+		System.out.println("changed " + event.getOffset());
 		return true;
 	}
 
@@ -53,30 +82,91 @@ public class FLASPartitioner implements IDocumentPartitioner {
 	@Override
 	public ITypedRegion[] computePartitioning(int offset, int length) {
 		System.out.println("compute partitioning called on " + document + " " + offset + " " + length);
-		List<ITypedRegion> rs = new ArrayList<ITypedRegion>();
+		Set<ITypedRegion> rs = new TreeSet<ITypedRegion>(new TRComparator());
+		rs.add(new TypedRegion(offset, length, "default"));
 		if (document != null) {
-			FindReplaceDocumentAdapter finder = new FindReplaceDocumentAdapter(document);
+			// What should really happen here is we should call "Compiler.parse(<document>)" and get back the parse tree, with offsets
+			// We should then look at the parse tree and figure everything out
+			
+			Compiler compiler = new Compiler();
 			try {
-				int max = offset + length;
-				IRegion r1;
-				while (offset < max && (r1 = finder.find(offset, "implements", true, false, true, false)) != null) {
-					System.out.println(r1);
-					rs.add(new TypedRegion(r1.getOffset(), 10, "keyword"));
-					offset = r1.getOffset()+1;
-				}
-			} catch (Exception ex) { 
+				ScopeEntry tree = compiler.parse("com.serializedstories.foo", document.get());
+				partitionOnTree(rs, tree);
+			} catch (ErrorResultException ex) {
 				ex.printStackTrace();
+				// we should report this as an error
 			}
 		}	
-		ITypedRegion[] ret = new ITypedRegion[rs.size()];
-		rs.toArray(ret);
-		return ret;
+		partitions = new ITypedRegion[rs.size()];
+		rs.toArray(partitions);
+		return partitions;
+	}
+
+	private void partitionOnTree(Set<ITypedRegion> rs, ScopeEntry tree) {
+		System.out.println("tree = " + tree);
+		if (tree == null)
+			return; // we can't do a lot here; we should probably have had an exception
+		Object o = tree.getValue();
+		if (o == null)
+			return;
+		
+		if (o instanceof PackageDefn) {
+			processInner(rs, ((PackageDefn)o).innerScope());
+		} else if (o instanceof CardDefinition) {
+			CardDefinition card = (CardDefinition) o;
+			identifier(rs, card.kw, "keyword");
+			for (ContractImplements x : card.contracts) {
+				identifier(rs, x.kw, "keyword");
+			}
+			for (HandlerImplements x : card.handlers) {
+				identifier(rs, x.kw, "keyword");
+			}
+			processInner(rs, card.innerScope());
+		} else if (o instanceof EventHandlerDefinition) {
+			EventHandlerDefinition ehd = (EventHandlerDefinition) o;
+			for (EventCaseDefn x : ehd.cases) {
+				identifier(rs, x.kw, "keyword");
+			}
+		} else
+			System.out.println("Yeah, whatever: " + o.getClass());
+	}
+
+	protected void processInner(Set<ITypedRegion> rs, Scope scope) {
+		for (Entry<String, ScopeEntry> x : scope) {
+			partitionOnTree(rs, x.getValue());
+		}
+	}
+
+	private void identifier(Set<ITypedRegion> rs, InputPosition location, String style) {
+		try {
+			IRegion r = document.getLineInformation(location.lineNo-1);
+			String dt = document.get(r.getOffset(), r.getLength());
+			int s=0;
+			while (s<dt.length() && Character.isWhitespace(dt.charAt(s)))
+				s++;
+			s += location.off;
+			int e = s;
+			while (e<dt.length() && (Character.isLetterOrDigit(dt.charAt(e)) || dt.charAt(e) == '.'))
+				e++;
+			System.out.println("keyword defn at " + (r.getOffset()+s) + " " + (e-s));
+			rs.add(new TypedRegion(r.getOffset() + s, e-s, style));
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public ITypedRegion getPartition(int offset) {
 		System.out.println("getPartition(" + offset + ") called");
-		return null;
+		ITypedRegion ret = null;
+		for (ITypedRegion r : partitions) {
+			if (r.getOffset() <= offset && r.getOffset()+r.getLength() > offset)
+				ret = r;
+			else if (r.getOffset() >= offset)
+				return ret;
+		}
+		return partitions[0];
 	}
 
 }
