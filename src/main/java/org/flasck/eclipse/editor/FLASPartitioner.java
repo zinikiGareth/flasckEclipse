@@ -1,5 +1,9 @@
 package org.flasck.eclipse.editor;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -23,6 +27,7 @@ import org.flasck.flas.parsedForm.HandlerImplements;
 import org.flasck.flas.parsedForm.PackageDefn;
 import org.flasck.flas.parsedForm.Scope;
 import org.flasck.flas.parsedForm.Scope.ScopeEntry;
+import org.flasck.flas.stories.StoryRet;
 
 public class FLASPartitioner implements IDocumentPartitioner {
 	public class TRComparator implements Comparator<ITypedRegion> {
@@ -57,13 +62,24 @@ public class FLASPartitioner implements IDocumentPartitioner {
 
 	@Override
 	public void documentAboutToBeChanged(DocumentEvent event) {
-		System.out.println("aboutToChange " + event.getOffset());
+//		System.out.println("aboutToChange " + event.getOffset());
 	}
 
 	@Override
 	public boolean documentChanged(DocumentEvent event) {
-		System.out.println("changed " + event.getOffset());
-		return true;
+//		System.out.println("changed " + event.getOffset() + " " + event.getLength());
+		try {
+			String s = document.get(event.getOffset(), event.getLength());
+			for (int i=0;i<s.length();i++) {
+				if (Character.isWhitespace(s.charAt(i))) {
+					computePartitioning(0, document.getLength());
+					return true;
+				}
+			}
+		} catch (BadLocationException ex) {
+			
+		}
+		return false;
 	}
 
 	@Override
@@ -90,11 +106,21 @@ public class FLASPartitioner implements IDocumentPartitioner {
 			
 			Compiler compiler = new Compiler();
 			try {
-				ScopeEntry tree = compiler.parse("com.serializedstories.foo", document.get());
-				partitionOnTree(rs, tree);
+				StoryRet tree = compiler.parse("com.serializedstories.foo", document.get());
+				if (tree.er.hasErrors()) {
+					try {
+						tree.er.showTo(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true), 4);
+					} catch (IOException e2) {
+						e2.printStackTrace();
+					}
+				}
+				partitionOnTree(rs, tree.top);
 			} catch (ErrorResultException ex) {
-				ex.printStackTrace();
-				// we should report this as an error
+				try {
+					ex.errors.showTo(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true), 4);
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}
 			}
 		}	
 		partitions = new ITypedRegion[rs.size()];
@@ -158,7 +184,7 @@ public class FLASPartitioner implements IDocumentPartitioner {
 
 	@Override
 	public ITypedRegion getPartition(int offset) {
-		System.out.println("getPartition(" + offset + ") called");
+//		System.out.println("getPartition(" + offset + ") called");
 		ITypedRegion ret = null;
 		for (ITypedRegion r : partitions) {
 			if (r.getOffset() <= offset && r.getOffset()+r.getLength() > offset)

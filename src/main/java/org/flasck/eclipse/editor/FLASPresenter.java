@@ -4,6 +4,7 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.presentation.IPresentationDamager;
 import org.eclipse.jface.text.presentation.IPresentationRepairer;
@@ -30,7 +31,7 @@ public class FLASPresenter implements IPresentationDamager, IPresentationRepaire
 	@Override
 	public IRegion getDamageRegion(ITypedRegion partition, DocumentEvent event, boolean documentPartitioningChanged) {
 		System.out.println("getDamageRegion called on " + document);
-		return null;
+		return new Region(0, event.getDocument().getLength());
 	}
 
 	@Override
