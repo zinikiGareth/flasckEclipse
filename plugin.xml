@@ -31,4 +31,15 @@
             <run class="org.flasck.eclipse.builder.FLASBuilder"></run>
       </builder>
    </extension>
+   
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            id="org.flasck.eclipse.editor.flasEditor"
+            class="org.flasck.eclipse.editor.FLASEditor"
+            default="false"
+            extensions="fl"
+            name="FLAS Editor">
+      </editor>
+   </extension>
 </plugin>
