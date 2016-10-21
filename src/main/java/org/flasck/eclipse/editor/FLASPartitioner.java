@@ -18,13 +18,11 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedRegion;
 import org.flasck.flas.Compiler;
 import org.flasck.flas.blockForm.InputPosition;
-import org.flasck.flas.errors.ErrorResultException;
 import org.flasck.flas.parsedForm.CardDefinition;
 import org.flasck.flas.parsedForm.ContractImplements;
 import org.flasck.flas.parsedForm.EventCaseDefn;
 import org.flasck.flas.parsedForm.EventHandlerDefinition;
 import org.flasck.flas.parsedForm.HandlerImplements;
-import org.flasck.flas.parsedForm.PackageDefn;
 import org.flasck.flas.parsedForm.Scope;
 import org.flasck.flas.parsedForm.Scope.ScopeEntry;
 import org.flasck.flas.stories.StoryRet;
@@ -105,27 +103,25 @@ public class FLASPartitioner implements IDocumentPartitioner {
 			// We should then look at the parse tree and figure everything out
 			
 			Compiler compiler = new Compiler();
-			try {
-				StoryRet tree = compiler.parse("com.serializedstories.foo", document.get());
-				if (tree.er.hasErrors()) {
-					try {
-						tree.er.showTo(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true), 4);
-					} catch (IOException e2) {
-						e2.printStackTrace();
-					}
-				}
-				partitionOnTree(rs, tree.top);
-			} catch (ErrorResultException ex) {
+			StoryRet tree = compiler.parse("com.serializedstories.foo", document.get());
+			if (tree.er.hasErrors()) {
 				try {
-					ex.errors.showTo(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true), 4);
+					tree.er.showTo(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true), 4);
 				} catch (IOException e2) {
 					e2.printStackTrace();
 				}
 			}
+			partitionScope(rs, tree.scope);
 		}	
 		partitions = new ITypedRegion[rs.size()];
 		rs.toArray(partitions);
 		return partitions;
+	}
+
+	private void partitionScope(Set<ITypedRegion> rs, Scope scope) {
+		for (Entry<String, ScopeEntry> x : scope) {
+			partitionOnTree(rs, x.getValue());
+		}
 	}
 
 	private void partitionOnTree(Set<ITypedRegion> rs, ScopeEntry tree) {
@@ -136,9 +132,7 @@ public class FLASPartitioner implements IDocumentPartitioner {
 		if (o == null)
 			return;
 		
-		if (o instanceof PackageDefn) {
-			processInner(rs, ((PackageDefn)o).innerScope());
-		} else if (o instanceof CardDefinition) {
+		if (o instanceof CardDefinition) {
 			CardDefinition card = (CardDefinition) o;
 			identifier(rs, card.kw, "keyword");
 			for (ContractImplements x : card.contracts) {
@@ -147,7 +141,7 @@ public class FLASPartitioner implements IDocumentPartitioner {
 			for (HandlerImplements x : card.handlers) {
 				identifier(rs, x.kw, "keyword");
 			}
-			processInner(rs, card.innerScope());
+			partitionScope(rs, card.innerScope());
 		} else if (o instanceof EventHandlerDefinition) {
 			EventHandlerDefinition ehd = (EventHandlerDefinition) o;
 			for (EventCaseDefn x : ehd.cases) {
@@ -155,12 +149,6 @@ public class FLASPartitioner implements IDocumentPartitioner {
 			}
 		} else
 			System.out.println("Yeah, whatever: " + o.getClass());
-	}
-
-	protected void processInner(Set<ITypedRegion> rs, Scope scope) {
-		for (Entry<String, ScopeEntry> x : scope) {
-			partitionOnTree(rs, x.getValue());
-		}
 	}
 
 	private void identifier(Set<ITypedRegion> rs, InputPosition location, String style) {

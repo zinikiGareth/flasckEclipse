@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -43,15 +44,14 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
+		System.out.println("Build called for " + kind + " on " + getProject());
 		Set<IFolder> inputs = null;
 		switch (kind) {
 		case FULL_BUILD: {
 			parseSettingsFile();
 			inputs = new HashSet<IFolder>();
-			for (IResource r : getProject().members(IResource.FILE)) {
-				if (r.getName().endsWith(".fl"))
-					inputs.add((IFolder)r.getParent());
-			}
+			IContainer from = getProject();
+			collectInputs(inputs, from);
 			break;
 		}
 		case AUTO_BUILD:
@@ -69,6 +69,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 			System.out.println("How to handle build kind " + kind);
 			break;
 		}
+		System.out.println("ok, inputs = " + inputs);
 		if (inputs != null) {
 			Compiler compiler = getConfiguredCompiler();
 			for (IFolder f : inputs)
@@ -79,6 +80,15 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		
 		// projects we depend on
 		return null;
+	}
+
+	protected void collectInputs(Set<IFolder> inputs, IContainer from) throws CoreException {
+		for (IResource r : from.members(IContainer.EXCLUDE_DERIVED)) {
+			if (r instanceof IContainer)
+				collectInputs(inputs, (IContainer) r);
+			else if (r.getName().endsWith(".fl"))
+				inputs.add((IFolder)r.getParent());
+		}
 	}
 
 	private void parseSettingsFile() {
@@ -124,7 +134,9 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		try {
 			try {
 				f.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+				System.out.println("Compiling in " + dir);
 				compiler.compile(dir);
+				System.out.println("Compilation done");
 			} catch (ErrorResultException ex) {
 				try {
 					ErrorResult er = ex.errors;
