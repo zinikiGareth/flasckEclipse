@@ -5,7 +5,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -21,7 +20,6 @@ import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.parsedForm.CardDefinition;
 import org.flasck.flas.parsedForm.ContractImplements;
 import org.flasck.flas.parsedForm.EventCaseDefn;
-import org.flasck.flas.parsedForm.EventHandlerDefinition;
 import org.flasck.flas.parsedForm.HandlerImplements;
 import org.flasck.flas.parsedForm.Scope;
 import org.flasck.flas.parsedForm.Scope.ScopeEntry;
@@ -119,8 +117,8 @@ public class FLASPartitioner implements IDocumentPartitioner {
 	}
 
 	private void partitionScope(Set<ITypedRegion> rs, Scope scope) {
-		for (Entry<String, ScopeEntry> x : scope) {
-			partitionOnTree(rs, x.getValue());
+		for (ScopeEntry x : scope) {
+			partitionOnTree(rs, x);
 		}
 	}
 
@@ -142,11 +140,9 @@ public class FLASPartitioner implements IDocumentPartitioner {
 				identifier(rs, x.kw, "keyword");
 			}
 			partitionScope(rs, card.innerScope());
-		} else if (o instanceof EventHandlerDefinition) {
-			EventHandlerDefinition ehd = (EventHandlerDefinition) o;
-			for (EventCaseDefn x : ehd.cases) {
-				identifier(rs, x.kw, "keyword");
-			}
+		} else if (o instanceof EventCaseDefn) {
+			EventCaseDefn ehd = (EventCaseDefn) o;
+			identifier(rs, ehd.kw, "keyword");
 		} else
 			System.out.println("Yeah, whatever: " + o.getClass());
 	}
