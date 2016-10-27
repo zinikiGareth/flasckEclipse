@@ -32,12 +32,12 @@ public class FLASPresenter implements IPresentationDamager, IPresentationRepaire
 		public Presentation(ColorRegistry colors, FontRegistry fonts, String key) {
 			color = colors.getColorDescriptor("org.flasck.eclipse.flas.preferences.colors." + key).createColor(display);
 			bgcolor = colors.getColorDescriptor("org.flasck.eclipse.flas.preferences.bgcolor." + key).createColor(display);
+//			bgcolor = colors.getColorDescriptor("org.eclipse.jdt.ui.ColoredLabels.writeaccess_highlight").createColor(display);
 			FontData[] fd = fonts.getFontData("org.flasck.eclipse.flas.preferences.fonts." + key);
 			if (fd != null && fd.length > 0)
 				font = new Font(display, fd[0]);
 			else
 				font = null;
-//			bgcolor = colors.getColorDescriptor("org.eclipse.jdt.ui.ColoredLabels.writeaccess_highlight").createColor(display);
 		}
 	}
 	

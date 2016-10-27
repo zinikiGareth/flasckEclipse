@@ -15,9 +15,13 @@ import org.flasck.flas.commonBase.ApplyExpr;
 import org.flasck.flas.commonBase.Locatable;
 import org.flasck.flas.commonBase.NumericLiteral;
 import org.flasck.flas.commonBase.StringLiteral;
+import org.flasck.flas.commonBase.template.TemplateFormat;
+import org.flasck.flas.commonBase.template.TemplateList;
 import org.flasck.flas.parsedForm.CardDefinition;
+import org.flasck.flas.parsedForm.ContentExpr;
 import org.flasck.flas.parsedForm.ContractImplements;
 import org.flasck.flas.parsedForm.EventCaseDefn;
+import org.flasck.flas.parsedForm.EventHandler;
 import org.flasck.flas.parsedForm.HandlerImplements;
 import org.flasck.flas.parsedForm.MethodCaseDefn;
 import org.flasck.flas.parsedForm.MethodMessage;
@@ -26,10 +30,14 @@ import org.flasck.flas.parsedForm.Scope.ScopeEntry;
 import org.flasck.flas.parsedForm.StateDefinition;
 import org.flasck.flas.parsedForm.StructField;
 import org.flasck.flas.parsedForm.Template;
+import org.flasck.flas.parsedForm.TemplateCardReference;
+import org.flasck.flas.parsedForm.TemplateDiv;
+import org.flasck.flas.parsedForm.TemplateFormatEvents;
 import org.flasck.flas.parsedForm.TypeReference;
 import org.flasck.flas.parsedForm.UnresolvedOperator;
 import org.flasck.flas.parsedForm.UnresolvedVar;
 import org.flasck.flas.parsedForm.VarPattern;
+import org.flasck.flas.tokenizers.TemplateToken;
 import org.zinutils.reflection.Reflection;
 
 public class PartitionAccumulator {
@@ -56,6 +64,9 @@ public class PartitionAccumulator {
 	}
 
 	public void processScope(Scope scope) {
+		if (scope == null)
+			return;
+		
 		for (ScopeEntry x : scope) {
 			if (x != null)
 				processEntry(x.getValue());
@@ -73,17 +84,11 @@ public class PartitionAccumulator {
 			if (!ex.toString().contains("There is no matching method"))
 				ex.printStackTrace();
 		}
-		/*
-		if (o instanceof CardDefinition) {
-		} else if (o instanceof EventCaseDefn) {
-			EventCaseDefn ehd = (EventCaseDefn) o;
-			identifier(ehd.kw, "keyword");
-		} else
-			System.out.println("Yeah, whatever: " + o.getClass());
-			*/
 	}
 
 	private void processList(List<?> list) {
+		if (list == null)
+			return;
 		for (Object o : list)
 			processEntry(o);
 	}
@@ -116,6 +121,66 @@ public class PartitionAccumulator {
 
 	public void processObject(Template t) {
 		region(t.kw, "keyword");
+		region(t.location(), "field");
+		processList(t.args);
+		processEntry(t.content);
+	}
+
+	public void processObject(TemplateDiv td) {
+		region(td.kw, "keyword");
+		processList(td.attrs);
+		processList(td.nested);
+		processFormatsEvents(td);
+	}
+
+	public void processObject(TemplateList td) {
+		region(td.kw, "keyword");
+		region(td.listLoc, "field");
+		region(td.iterLoc, "var");
+		processList(td.formats);
+		processFormats(td);
+		processEntry(td.template);
+	}
+
+	public void processObject(TemplateCardReference cr) {
+		region(cr.kw, "keyword");
+		if (cr.explicitCard != null)
+			region(cr.location, "typename");
+		else
+			region(cr.location, "field");
+	}
+
+	public void processObject(ContentExpr ce) {
+		region(((Locatable)ce.expr).location(), "field");
+		processFormatsEvents(ce);
+	}
+	
+	public void processObject(EventHandler eh) {
+		region(eh.actionPos, "keyword");
+		region(eh.kw, "symbol");
+		processEntry(eh.expr);
+	}
+	
+	public void processObject(TemplateToken tt) {
+		if (tt.type == TemplateToken.STRING) {
+			region(tt.location, "literal");
+		} else
+			System.out.println("Handle template token " + tt.type);
+		
+//		region(cr.kw, "keyword");
+//		if (cr.explicitCard != null)
+//			region(cr.location, "typename");
+//		else
+//			region(cr.location, "field");
+	}
+
+	private void processFormatsEvents(TemplateFormatEvents td) {
+		processList(td.handlers);
+		processFormats(td);
+	}
+
+	private void processFormats(TemplateFormat td) {
+		processList(td.formats);
 	}
 
 	public void processObject(ContractImplements ci) {
@@ -125,7 +190,6 @@ public class PartitionAccumulator {
 			region(ci.varLocation, "field");
 		processList(ci.methods);
 	}
-
 	public void processObject(HandlerImplements hi) {
 		region(hi.kw, "keyword");
 		region(hi.typeLocation, "typename");
@@ -210,6 +274,8 @@ public class PartitionAccumulator {
 	}
 
 	private void region(InputPosition location, String style) {
+		if (location == null)
+			return;
 		try {
 			if (!location.hasEnd()) {
 				System.out.println("Token " + location + " does not have end point");
