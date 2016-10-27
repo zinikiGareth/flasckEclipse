@@ -39,7 +39,196 @@
             class="org.flasck.eclipse.editor.FLASEditor"
             default="false"
             extensions="fl"
-            name="FLAS Editor">
+            name="FLAS Editor"
+            symbolicFontName="org.flasck.eclipse.flas.preferences.fonts.flas-default">
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.flasck.eclipse.preferences.PreferencePage"
+            id="org.flasck.eclipse.preferences.PreferencePage"
+            name="Flasck">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.flasck.eclipse.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+         <themeElementCategory id="org.flasck.eclipse.flas.preferences.category" label="Flasck">
+         	<description>Flasck editing</description>
+         </themeElementCategory>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.flas-default"
+         	label="Default"
+         	value="COLOR_GRAY">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.flas-default"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.flas-default"
+         	label="Default"
+         	value="Monaco-regular-11">
+         	<description>The font for keywords</description>
+         </fontDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.field"
+         	label="Fields"
+         	value="COLOR_GRAY">
+         	<description>The color for keywords</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.field"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.field"
+         	label="Fields"
+         	defaultsTo="org.flasck.eclipse.flas.preferences.fonts.flas-default">
+         	<description>The font for keywords</description>
+         </fontDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.keyword"
+         	label="Keywords"
+         	value="COLOR_DARK_BLUE">
+         	<description>The color for keywords</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.keyword"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.keyword"
+         	label="Keywords"
+         	defaultsTo="org.flasck.eclipse.flas.preferences.fonts.flas-default">
+         	<description>The font for keywords</description>
+         </fontDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.literal"
+         	label="Literals"
+         	value="COLOR_GREEN">
+         	<description>The color for keywords</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.literal"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.literal"
+         	label="Literals"
+         	defaultsTo="org.flasck.eclipse.flas.preferences.fonts.flas-default">
+         	<description>The font for keywords</description>
+         </fontDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.methodname"
+         	label="Method Names"
+         	value="255,64,64">
+         	<description>The color for keywords</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.methodname"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.methodname"
+         	label="Method Names"
+         	defaultsTo="org.flasck.eclipse.flas.preferences.fonts.flas-default">
+         	<description>The font for keywords</description>
+         </fontDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.symbol"
+         	label="Symbols"
+         	value="COLOR_BLACK">
+         	<description>The color for keywords</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.symbol"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.symbol"
+         	label="Symbols"
+         	defaultsTo="org.flasck.eclipse.flas.preferences.fonts.flas-default">
+         	<description>The font for keywords</description>
+         </fontDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.typename"
+         	label="Type Names"
+         	value="64,64,64">
+         	<description>The color for keywords</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.typename"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.typename"
+         	label="Type Names"
+         	defaultsTo="org.flasck.eclipse.flas.preferences.fonts.flas-default">
+         	<description>The font for keywords</description>
+         </fontDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.colors.var"
+         	label="Vars"
+         	value="192,128,255">
+         	<description>The color for vars</description>
+         </colorDefinition>
+         <colorDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.bgcolor.var"
+         	label="Default"
+         	value="COLOR_WHITE">
+         	<description>The color for default text</description>
+         </colorDefinition>
+         <fontDefinition
+         	categoryId="org.flasck.eclipse.flas.preferences.category"
+         	id="org.flasck.eclipse.flas.preferences.fonts.var"
+         	label="Vars"
+         	defaultsTo="org.flasck.eclipse.flas.preferences.fonts.flas-default">
+         	<description>The font for vars</description>
+         </fontDefinition>
    </extension>
 </plugin>

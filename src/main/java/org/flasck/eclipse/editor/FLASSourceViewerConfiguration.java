@@ -7,12 +7,15 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 public class FLASSourceViewerConfiguration extends SourceViewerConfiguration {
 
+	public static final String[] types = { "field", "keyword", "literal", "methodname", "symbol", "typename", "var" };
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		System.out.println("Asked for reconciler");
 		PresentationReconciler ret = new PresentationReconciler();
-		ret.setDamager(new FLASPresenter(), "keyword");
-		ret.setRepairer(new FLASPresenter(), "keyword");
+		FLASPresenter presenter = new FLASPresenter();
+		for (String s : types) {
+			ret.setDamager(presenter, s);
+			ret.setRepairer(presenter, s);
+		}
 		return ret;
 	}
 }
