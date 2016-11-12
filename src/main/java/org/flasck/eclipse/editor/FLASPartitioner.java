@@ -64,11 +64,11 @@ public class FLASPartitioner implements IDocumentPartitioner {
 
 	@Override
 	public ITypedRegion[] computePartitioning(int offset, int length) {
-//		System.out.println("compute partitioning called on " + document + " " + offset + " " + length);
+		System.out.println("compute partitioning called on " + document + " " + offset + " " + length);
 		PartitionAccumulator acc = new PartitionAccumulator(document);
 		if (document != null) {
 			Compiler compiler = new Compiler();
-			// It is ludicrous how hard it seems to be to get the file from the document
+			// It is ludicrous how hard it seems to be to get the file path from the document in Eclipse
 			// In the meantime I'm just "making up" a package ID
 			StoryRet tree = compiler.parse("com.foo", document.get());
 			if (tree.er.hasErrors()) {
@@ -80,12 +80,14 @@ public class FLASPartitioner implements IDocumentPartitioner {
 			}
 			acc.processScope(tree.scope);
 		}	
-		return acc.toArray();
+		partitions = acc.toArray();
+		
+		return partitions;
 	}
 
 	@Override
 	public ITypedRegion getPartition(int offset) {
-//		System.out.println("getPartition(" + offset + ") called");
+		System.out.println("getPartition(" + offset + ") called");
 		ITypedRegion ret = null;
 		for (ITypedRegion r : partitions) {
 			if (r.getOffset() <= offset && r.getOffset()+r.getLength() > offset)

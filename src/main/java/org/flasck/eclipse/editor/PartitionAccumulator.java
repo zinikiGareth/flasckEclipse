@@ -1,5 +1,6 @@
 package org.flasck.eclipse.editor;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -15,11 +16,11 @@ import org.flasck.flas.commonBase.ApplyExpr;
 import org.flasck.flas.commonBase.Locatable;
 import org.flasck.flas.commonBase.NumericLiteral;
 import org.flasck.flas.commonBase.StringLiteral;
-import org.flasck.flas.commonBase.template.TemplateFormat;
-import org.flasck.flas.commonBase.template.TemplateList;
 import org.flasck.flas.parsedForm.CardDefinition;
 import org.flasck.flas.parsedForm.ContentExpr;
+import org.flasck.flas.parsedForm.ContractDecl;
 import org.flasck.flas.parsedForm.ContractImplements;
+import org.flasck.flas.parsedForm.ContractMethodDecl;
 import org.flasck.flas.parsedForm.EventCaseDefn;
 import org.flasck.flas.parsedForm.EventHandler;
 import org.flasck.flas.parsedForm.HandlerImplements;
@@ -32,8 +33,11 @@ import org.flasck.flas.parsedForm.StructField;
 import org.flasck.flas.parsedForm.Template;
 import org.flasck.flas.parsedForm.TemplateCardReference;
 import org.flasck.flas.parsedForm.TemplateDiv;
+import org.flasck.flas.parsedForm.TemplateFormat;
 import org.flasck.flas.parsedForm.TemplateFormatEvents;
+import org.flasck.flas.parsedForm.TemplateList;
 import org.flasck.flas.parsedForm.TypeReference;
+import org.flasck.flas.parsedForm.TypedPattern;
 import org.flasck.flas.parsedForm.UnresolvedOperator;
 import org.flasck.flas.parsedForm.UnresolvedVar;
 import org.flasck.flas.parsedForm.VarPattern;
@@ -111,6 +115,24 @@ public class PartitionAccumulator {
 	public void processObject(StructField sf) {
 		processEntry(sf.type);
 		region(sf.location(), "field");
+	}
+	
+	public void processObject(ContractDecl cd) {
+		region(cd.kw, "keyword");
+		region(cd.location(), "typename");
+		for (ContractMethodDecl m : cd.methods) {
+			processEntry(m);
+		}
+	}
+
+	public void processObject(ContractMethodDecl cmd) {
+		if (cmd.rkw != null)
+			region(cmd.rkw, "keyword"); // the "optional" keyword
+		region(cmd.dkw, "keyword"); // up/down
+		region(cmd.location(), "methodname");
+		for (Object arg : cmd.args) {
+			processEntry(arg);
+		}
 	}
 
 	public void processObject(TypeReference tr) {
@@ -212,6 +234,11 @@ public class PartitionAccumulator {
 		processScope(q.innerScope());
 	}
 
+	public void processObject(TypedPattern tp) {
+		region(tp.typeLocation, "typename");
+		region(tp.varLocation, "var");
+	}
+
 	public void processObject(VarPattern vp) {
 		region(vp.location(), "var");
 	}
@@ -290,6 +317,17 @@ public class PartitionAccumulator {
 			s += location.off;
 //			System.out.println("identifier at " + (r.getOffset()+s) + " " + (e-s) + " has style " + style);
 			rs.add(new TypedRegion(r.getOffset() + s, e-s, style));
+			int off = 0;
+			List<ITypedRegion> defaults = new ArrayList<>();
+			for (ITypedRegion r1 : rs) {
+				if (r1.getOffset() > off) {
+					defaults.add(new TypedRegion(off, r1.getOffset()-off, "flas-default"));
+				}
+				off = r1.getOffset()+r1.getLength();
+			}
+			if (off < document.getLength())
+				defaults.add(new TypedRegion(off, document.getLength()-off, "flas-default"));
+			rs.addAll(defaults);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -297,6 +335,9 @@ public class PartitionAccumulator {
 	}
 
 	public ITypedRegion[] toArray() {
-		return rs.toArray(new ITypedRegion[rs.size()]);
+		System.out.println("doc = " + document.getLength());
+		ITypedRegion[] array = rs.toArray(new ITypedRegion[rs.size()]);
+		System.out.println("Returning " + rs.size() + " entries as " + array);
+		return array;
 	}
 }

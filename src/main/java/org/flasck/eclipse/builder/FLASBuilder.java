@@ -122,7 +122,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		if (jsout != null)
 			ret.writeJSTo(getProject().getFolder(jsout).getLocation().toFile());
 		if (droid != null)
-			ret.writeDroidTo(getProject().getFolder(droid).getLocation().toFile());
+			ret.writeDroidTo(getProject().getFolder(droid).getLocation().toFile(), true);
 		for (String s : refs) {
 			ret.searchIn(new File(s));
 		}
