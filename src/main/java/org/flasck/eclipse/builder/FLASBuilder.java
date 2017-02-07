@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.Document;
-import org.flasck.flas.Compiler;
+import org.flasck.flas.compiler.FLASCompiler;
 import org.flasck.flas.errors.ErrorResult;
 import org.flasck.flas.errors.ErrorResultException;
 import org.flasck.flas.errors.FLASError;
@@ -71,7 +71,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		}
 		System.out.println("ok, inputs = " + inputs);
 		if (inputs != null) {
-			Compiler compiler = getConfiguredCompiler();
+			FLASCompiler compiler = getConfiguredCompiler();
 			for (IFolder f : inputs)
 				build(compiler, f);
 		}
@@ -115,8 +115,8 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-	protected Compiler getConfiguredCompiler() {
-		Compiler ret = new Compiler();
+	protected FLASCompiler getConfiguredCompiler() {
+		FLASCompiler ret = new FLASCompiler();
 		if (flim != null)
 			ret.writeFlimTo(getProject().getFolder(flim).getLocation().toFile());
 		if (jsout != null)
@@ -129,7 +129,8 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		return ret;
 	}
 
-	private void build(Compiler compiler, IFolder f) {
+	// TODO: this should be an interface, I think
+	private void build(FLASCompiler compiler, IFolder f) {
 		File dir = f.getLocation().toFile();
 		try {
 			try {

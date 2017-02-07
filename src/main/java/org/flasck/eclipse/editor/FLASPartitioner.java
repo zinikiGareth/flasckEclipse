@@ -10,7 +10,8 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.ITypedRegion;
-import org.flasck.flas.Compiler;
+import org.eclipse.jface.text.TypedRegion;
+import org.flasck.flas.compiler.FLASCompiler;
 import org.flasck.flas.stories.StoryRet;
 
 public class FLASPartitioner implements IDocumentPartitioner {
@@ -67,7 +68,7 @@ public class FLASPartitioner implements IDocumentPartitioner {
 		System.out.println("compute partitioning called on " + document + " " + offset + " " + length);
 		PartitionAccumulator acc = new PartitionAccumulator(document);
 		if (document != null) {
-			Compiler compiler = new Compiler();
+			FLASCompiler compiler = new FLASCompiler();
 			// It is ludicrous how hard it seems to be to get the file path from the document in Eclipse
 			// In the meantime I'm just "making up" a package ID
 			StoryRet tree = compiler.parse("com.foo", document.get());
@@ -89,6 +90,8 @@ public class FLASPartitioner implements IDocumentPartitioner {
 	public ITypedRegion getPartition(int offset) {
 		System.out.println("getPartition(" + offset + ") called");
 		ITypedRegion ret = null;
+		if (partitions == null) // this really shouldn't happen
+			return new TypedRegion(0, document.getLength(), "flas-default");
 		for (ITypedRegion r : partitions) {
 			if (r.getOffset() <= offset && r.getOffset()+r.getLength() > offset)
 				ret = r;
