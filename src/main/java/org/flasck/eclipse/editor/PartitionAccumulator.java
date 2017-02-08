@@ -335,9 +335,6 @@ public class PartitionAccumulator {
 	}
 
 	public ITypedRegion[] toArray() {
-		System.out.println("doc = " + document.getLength());
-		ITypedRegion[] array = rs.toArray(new ITypedRegion[rs.size()]);
-		System.out.println("Returning " + rs.size() + " entries as " + array);
-		return array;
+		return rs.toArray(new ITypedRegion[rs.size()]);
 	}
 }

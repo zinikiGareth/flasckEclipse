@@ -29,7 +29,7 @@ import org.zinutils.xml.XMLElement;
 
 public class FLASBuilder extends IncrementalProjectBuilder {
 	private String jsout;
-	private String droid;
+	private String jvmOut;
 	private String flim;
 	private Set<String> refs = new TreeSet<String>();
 
@@ -44,10 +44,12 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
-		System.out.println("Build called for " + kind + " on " + getProject());
+//		System.out.println("Build called for " + kind + " on " + getProject());
 		Set<IFolder> inputs = null;
+		String type = "unknown";
 		switch (kind) {
 		case FULL_BUILD: {
+			type = "full";
 			parseSettingsFile();
 			inputs = new HashSet<IFolder>();
 			IContainer from = getProject();
@@ -56,6 +58,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		}
 		case AUTO_BUILD:
 		case INCREMENTAL_BUILD: {
+			type = "incremental";
 			IResourceDelta delta = getDelta(getProject());
 			FLASDeltaVisitor analyzer = new FLASDeltaVisitor();
 			delta.accept(analyzer);
@@ -66,14 +69,16 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 		}
 		case CLEAN_BUILD:
 		default:
-			System.out.println("How to handle build kind " + kind);
+			System.out.println("How to handle build kind " + kind + "?");
 			break;
 		}
-		System.out.println("ok, inputs = " + inputs);
 		if (inputs != null) {
+			System.out.println("starting " + type + " build for " + inputs);
 			FLASCompiler compiler = getConfiguredCompiler();
 			for (IFolder f : inputs)
 				build(compiler, f);
+		} else {
+			System.out.println("Nothing to do for " + type + " build");
 		}
 		
 		getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -104,14 +109,14 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 				// we are currently ignoring this and just going with "everything is source if it ends in .fl"
 			} else if (xe.hasTag("JavaScript")) {
 				jsout = xe.get("dir");
-			} else if (xe.hasTag("Android")) {
-				droid = xe.get("dir");
+			} else if (xe.hasTag("JVM")) {
+				jvmOut = xe.get("dir");
 			} else if (xe.hasTag("Flim")) {
 				flim = xe.get("dir");
 			} else if (xe.hasTag("Reference")) {
 				refs.add(xe.get("dir"));
 			} else
-				System.err.println("Cannot handle XE: " + xe.serialize());
+				System.err.println("Cannot handle XE: " + xe.serialize(false));
 		}
 	}
 
@@ -121,8 +126,8 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 			ret.writeFlimTo(getProject().getFolder(flim).getLocation().toFile());
 		if (jsout != null)
 			ret.writeJSTo(getProject().getFolder(jsout).getLocation().toFile());
-		if (droid != null)
-			ret.writeDroidTo(getProject().getFolder(droid).getLocation().toFile(), true);
+		if (jvmOut != null)
+			ret.writeDroidTo(getProject().getFolder(jvmOut).getLocation().toFile(), true);
 		for (String s : refs) {
 			ret.searchIn(new File(s));
 		}

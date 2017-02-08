@@ -52,13 +52,13 @@ public class FLASPartitioner implements IDocumentPartitioner {
 
 	@Override
 	public String[] getLegalContentTypes() {
-		System.out.println("getLegalContentTypes called");
+//		System.out.println("getLegalContentTypes called");
 		return null;
 	}
 
 	@Override
 	public String getContentType(int offset) {
-		System.out.println("getContentType called at " + offset);
+//		System.out.println("getContentType called at " + offset);
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -88,7 +88,7 @@ public class FLASPartitioner implements IDocumentPartitioner {
 
 	@Override
 	public ITypedRegion getPartition(int offset) {
-		System.out.println("getPartition(" + offset + ") called");
+//		System.out.println("getPartition(" + offset + ") called");
 		ITypedRegion ret = null;
 		if (partitions == null) // this really shouldn't happen
 			return new TypedRegion(0, document.getLength(), "flas-default");

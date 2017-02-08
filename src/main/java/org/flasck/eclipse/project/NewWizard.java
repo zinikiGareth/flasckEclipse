@@ -1,9 +1,13 @@
 package org.flasck.eclipse.project;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -28,10 +32,10 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.flasck.eclipse.Activator;
+import org.zinutils.xml.XML;
 
 @SuppressWarnings("restriction")
 public class NewWizard extends BasicNewResourceWizard {
-
 	private IProject newProject;
 	private WizardNewProjectCreationPage mainPage;
 	
@@ -82,11 +86,24 @@ public class NewWizard extends BasicNewResourceWizard {
 			flim.create(false, true, null);
 			IFolder jso = newProject.getFolder("jsout");
 			jso.create(false, true, null);
-			IFolder dgo = newProject.getFolder("droidout");
-			dgo.create(false, true, null);
+			IFolder jvo = newProject.getFolder("jvmout");
+			jvo.create(false, true, null);
 			
-			// TODO: also create outline 'settings.xml' file
+			// create an outline 'settings.xml' file
+			IFile sx = newProject.getFile("settings.xml");
+			XML xml = XML.create("1.0", "Settings");
+			xml.addElement("Source").setAttribute("dir", "src/main/flas");
+			xml.addElement("JavaScript").setAttribute("dir", "jsout");
+			xml.addElement("Flim").setAttribute("dir", "flim");
+			xml.addElement("JVM").setAttribute("dir", "jvmout");
+			xml.addElement("Reference").setAttribute("dir", "/Users/gareth/Ziniki/Over/FLAS2/src/main/resources/flim");
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			xml.write(baos, false);
+			ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
+			sx.create(is, false, null);
 		} catch (CoreException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 		return true;
