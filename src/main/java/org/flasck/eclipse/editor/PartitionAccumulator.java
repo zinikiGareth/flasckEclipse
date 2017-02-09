@@ -18,6 +18,7 @@ import org.flasck.flas.commonBase.NumericLiteral;
 import org.flasck.flas.commonBase.StringLiteral;
 import org.flasck.flas.parsedForm.CardDefinition;
 import org.flasck.flas.parsedForm.ContentExpr;
+import org.flasck.flas.parsedForm.ContentString;
 import org.flasck.flas.parsedForm.ContractDecl;
 import org.flasck.flas.parsedForm.ContractImplements;
 import org.flasck.flas.parsedForm.ContractMethodDecl;
@@ -29,6 +30,7 @@ import org.flasck.flas.parsedForm.MethodMessage;
 import org.flasck.flas.parsedForm.Scope;
 import org.flasck.flas.parsedForm.Scope.ScopeEntry;
 import org.flasck.flas.parsedForm.StateDefinition;
+import org.flasck.flas.parsedForm.StructDefn;
 import org.flasck.flas.parsedForm.StructField;
 import org.flasck.flas.parsedForm.Template;
 import org.flasck.flas.parsedForm.TemplateCardReference;
@@ -97,6 +99,11 @@ public class PartitionAccumulator {
 			processEntry(o);
 	}
 
+	public void processObject(StructDefn sd) {
+		region(sd.location(), "keyword");
+		processList(sd.fields);
+	}
+	
 	public void processObject(CardDefinition card) {
 		region(card.kw, "keyword");
 		region(card.location(), "typename");
@@ -172,6 +179,11 @@ public class PartitionAccumulator {
 			region(cr.location, "field");
 	}
 
+	public void processObject(ContentString cs) {
+		region(((Locatable)cs).location(), "literal");
+		processFormatsEvents(cs);
+	}
+	
 	public void processObject(ContentExpr ce) {
 		region(((Locatable)ce.expr).location(), "field");
 		processFormatsEvents(ce);
@@ -188,12 +200,6 @@ public class PartitionAccumulator {
 			region(tt.location, "literal");
 		} else
 			System.out.println("Handle template token " + tt.type);
-		
-//		region(cr.kw, "keyword");
-//		if (cr.explicitCard != null)
-//			region(cr.location, "typename");
-//		else
-//			region(cr.location, "field");
 	}
 
 	private void processFormatsEvents(TemplateFormatEvents td) {
