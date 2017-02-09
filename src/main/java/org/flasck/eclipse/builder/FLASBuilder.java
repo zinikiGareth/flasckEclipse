@@ -144,6 +144,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 				compiler.compile(dir);
 				System.out.println("Compilation done");
 			} catch (ErrorResultException ex) {
+//				ex.printStackTrace(System.out);
 				try {
 					ErrorResult er = ex.errors;
 					er.showTo(new PrintWriter(System.err), 4);
@@ -185,6 +186,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 						}
 					}
 				} catch (IOException e2) {
+					e2.printStackTrace(System.out);
 					// ok, then ...
 				}
 			}

@@ -65,7 +65,7 @@ public class FLASPartitioner implements IDocumentPartitioner {
 
 	@Override
 	public ITypedRegion[] computePartitioning(int offset, int length) {
-		System.out.println("compute partitioning called on " + document + " " + offset + " " + length);
+//		System.out.println("compute partitioning called on " + document + " " + offset + " " + length);
 		PartitionAccumulator acc = new PartitionAccumulator(document);
 		if (document != null) {
 			FLASCompiler compiler = new FLASCompiler();

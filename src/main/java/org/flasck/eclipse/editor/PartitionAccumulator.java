@@ -256,7 +256,7 @@ public class PartitionAccumulator {
 	public void processObject(ApplyExpr ae) {
 		if (tryHerdingDots(ae)) {
 			Object a2 = ae.args.get(1);
-			System.out.println("a2 = " + a2.getClass());
+//			System.out.println("a2 = " + a2.getClass());
 			if (a2 instanceof UnresolvedVar)
 				region(ae.location(), "field");
 			else
