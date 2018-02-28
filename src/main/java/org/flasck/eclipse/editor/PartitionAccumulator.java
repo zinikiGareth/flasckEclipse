@@ -1,16 +1,9 @@
 package org.flasck.eclipse.editor;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
-import org.eclipse.jface.text.TypedRegion;
 import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.commonBase.ApplyExpr;
 import org.flasck.flas.commonBase.Locatable;
@@ -24,6 +17,7 @@ import org.flasck.flas.parsedForm.ContractImplements;
 import org.flasck.flas.parsedForm.ContractMethodDecl;
 import org.flasck.flas.parsedForm.EventCaseDefn;
 import org.flasck.flas.parsedForm.EventHandler;
+import org.flasck.flas.parsedForm.FunctionCaseDefn;
 import org.flasck.flas.parsedForm.HandlerImplements;
 import org.flasck.flas.parsedForm.IScope;
 import org.flasck.flas.parsedForm.MethodCaseDefn;
@@ -47,26 +41,15 @@ import org.flasck.flas.tokenizers.TemplateToken;
 import org.zinutils.reflection.Reflection;
 
 public class PartitionAccumulator {
-	public class TRComparator implements Comparator<ITypedRegion> {
-		@Override
-		public int compare(ITypedRegion o1, ITypedRegion o2) {
-			if (o1.getOffset() < o2.getOffset())
-				return -1;
-			else if (o1.getOffset() > o2.getOffset())
-				return 1;
-			if (o1.getLength() > o2.getLength())
-				return -1;
-			else if (o1.getLength() < o2.getLength())
-				return 1;
-			return 0;
-		}
-	}
-
-	private final IDocument document;
-	private final Set<ITypedRegion> rs = new TreeSet<ITypedRegion>(new TRComparator());
+	private final IRegionCollector regionCollector;
 
 	public PartitionAccumulator(IDocument document) {
-		this.document = document;
+		this.regionCollector = new RegionCollector(document);
+	}
+
+	// for collaborator testing
+	public PartitionAccumulator(IRegionCollector collector) {
+		this.regionCollector = collector;
 	}
 
 	public void processScope(IScope scope) {
@@ -77,6 +60,8 @@ public class PartitionAccumulator {
 			if (x != null)
 				processEntry(x.getValue());
 		}
+		
+		regionCollector.process();
 	}
 
 	private void processEntry(Object o) {
@@ -85,10 +70,12 @@ public class PartitionAccumulator {
 		
 		try {
 			Reflection.call(this, "processObject", o);
-		} catch (Exception ex) {
+		} catch (RuntimeException ex) {
 			System.out.println("Cannot process object of type " + o.getClass());
-			if (!ex.toString().contains("There is no matching method"))
+			if (!ex.toString().contains("There is no matching method")) {
 				ex.printStackTrace();
+				throw ex;
+			}
 		}
 	}
 
@@ -240,6 +227,13 @@ public class PartitionAccumulator {
 		processScope(q.innerScope());
 	}
 
+	public void processObject(FunctionCaseDefn q) {
+		region(q.location(), "methodname");
+		processList(q.intro.args);
+		processEntry(q.expr);
+		processScope(q.innerScope());
+	}
+
 	public void processObject(TypedPattern tp) {
 		region(tp.typeLocation, "typename");
 		region(tp.varLocation, "var");
@@ -262,7 +256,6 @@ public class PartitionAccumulator {
 	public void processObject(ApplyExpr ae) {
 		if (tryHerdingDots(ae)) {
 			Object a2 = ae.args.get(1);
-//			System.out.println("a2 = " + a2.getClass());
 			if (a2 instanceof UnresolvedVar)
 				region(ae.location(), "field");
 			else
@@ -302,45 +295,17 @@ public class PartitionAccumulator {
 	}
 
 	public void processObject(UnresolvedOperator op) {
-		System.out.println("op = " + op.op);
+//		System.out.println("op = " + op.op);
 		region(op.location(), "symbol");
 	}
 
-	private void region(InputPosition location, String style) {
-		if (location == null)
+	public void region(InputPosition loc, String style) {
+		if (loc == null || loc.isFake())
 			return;
-		try {
-			if (!location.hasEnd()) {
-				System.out.println("Token " + location + " does not have end point");
-				return;
-			}
-			IRegion r = document.getLineInformation(location.lineNo-1);
-			String dt = document.get(r.getOffset(), r.getLength());
-			int s=0;
-			while (s<dt.length() && Character.isWhitespace(dt.charAt(s)))
-				s++;
-			int e = s + location.pastEnd();
-			s += location.off;
-//			System.out.println("identifier at " + (r.getOffset()+s) + " " + (e-s) + " has style " + style);
-			rs.add(new TypedRegion(r.getOffset() + s, e-s, style));
-			int off = 0;
-			List<ITypedRegion> defaults = new ArrayList<>();
-			for (ITypedRegion r1 : rs) {
-				if (r1.getOffset() > off) {
-					defaults.add(new TypedRegion(off, r1.getOffset()-off, "flas-default"));
-				}
-				off = r1.getOffset()+r1.getLength();
-			}
-			if (off < document.getLength())
-				defaults.add(new TypedRegion(off, document.getLength()-off, "flas-default"));
-			rs.addAll(defaults);
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		regionCollector.add(loc, style);
 	}
-
+	
 	public ITypedRegion[] toArray() {
-		return rs.toArray(new ITypedRegion[rs.size()]);
+		return regionCollector.toArray();
 	}
 }
