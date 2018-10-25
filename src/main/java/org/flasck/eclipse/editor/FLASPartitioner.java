@@ -68,7 +68,7 @@ public class FLASPartitioner implements IDocumentPartitioner {
 //		System.out.println("compute partitioning called on " + document + " " + offset + " " + length);
 		PartitionAccumulator acc = new PartitionAccumulator(document);
 		if (document != null) {
-			FLASCompiler compiler = new FLASCompiler();
+			FLASCompiler compiler = new FLASCompiler(null);
 			// It is ludicrous how hard it seems to be to get the file path from the document in Eclipse
 			// In the meantime I'm just "making up" a package ID
 			StoryRet tree = compiler.parse("com.foo", document.get());

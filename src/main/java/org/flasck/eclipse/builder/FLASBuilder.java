@@ -121,7 +121,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 	}
 
 	protected FLASCompiler getConfiguredCompiler() {
-		FLASCompiler ret = new FLASCompiler();
+		FLASCompiler ret = new FLASCompiler(null);
 		if (flim != null)
 			ret.writeFlimTo(getProject().getFolder(flim).getLocation().toFile());
 		if (jsout != null)
