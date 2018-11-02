@@ -146,7 +146,7 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 			} catch (ErrorResultException ex) {
 //				ex.printStackTrace(System.out);
 				try {
-					ErrorResult er = ex.errors;
+					ErrorResult er = (ErrorResult) ex.errors;
 					er.showTo(new PrintWriter(System.err), 4);
 					for (int i=0;i<er.count();i++) {
 						FLASError err = er.get(i);
