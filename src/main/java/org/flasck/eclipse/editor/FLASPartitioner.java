@@ -12,7 +12,6 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedRegion;
 import org.flasck.flas.compiler.FLASCompiler;
-import org.flasck.flas.stories.StoryRet;
 
 public class FLASPartitioner implements IDocumentPartitioner {
 	private IDocument document;
@@ -71,15 +70,15 @@ public class FLASPartitioner implements IDocumentPartitioner {
 			FLASCompiler compiler = new FLASCompiler(null);
 			// It is ludicrous how hard it seems to be to get the file path from the document in Eclipse
 			// In the meantime I'm just "making up" a package ID
-			StoryRet tree = compiler.parse("com.foo", document.get());
-			if (tree.er.hasErrors()) {
-				try {
-					tree.er.showTo(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true), 4);
-				} catch (IOException e2) {
-					e2.printStackTrace();
-				}
-			}
-			acc.processScope(tree.scope);
+//			StoryRet tree = compiler.parse("com.foo", document.get());
+//			if (tree.er.hasErrors()) {
+//				try {
+//					tree.er.showTo(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true), 4);
+//				} catch (IOException e2) {
+//					e2.printStackTrace();
+//				}
+//			}
+//			acc.processScope(tree.scope);
 		}	
 		partitions = acc.toArray();
 		

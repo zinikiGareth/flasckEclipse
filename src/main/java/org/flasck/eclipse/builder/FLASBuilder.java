@@ -141,12 +141,12 @@ public class FLASBuilder extends IncrementalProjectBuilder {
 			try {
 				f.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
 				System.out.println("Compiling in " + dir);
-				compiler.compile(dir);
+//				compiler.compile(dir);
 				System.out.println("Compilation done");
-			} catch (ErrorResultException ex) {
+			} catch (/*ErrorResult*/Exception ex) {
 //				ex.printStackTrace(System.out);
 				try {
-					ErrorResult er = (ErrorResult) ex.errors;
+					ErrorResult er = (ErrorResult) ((ErrorResultException)ex).errors;
 					er.showTo(new PrintWriter(System.err), 4);
 					for (int i=0;i<er.count();i++) {
 						FLASError err = er.get(i);

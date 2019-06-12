@@ -98,7 +98,7 @@ public class PartitionAccumulator {
 		processList(card.templates);
 		processList(card.contracts);
 		processList(card.handlers);
-		processScope(card.innerScope());
+//		processScope(card.innerScope());
 	}
 
 	public void processObject(StateDefinition sd) {
