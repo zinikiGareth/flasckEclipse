@@ -231,7 +231,7 @@ public class PartitionAccumulator {
 		region(q.location(), "methodname");
 		processList(q.intro.args);
 		processEntry(q.expr);
-		processScope(q.innerScope());
+//		processScope(q.innerScope());
 	}
 
 	public void processObject(TypedPattern tp) {
