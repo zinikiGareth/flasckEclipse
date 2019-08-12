@@ -6,5 +6,25 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/FLAS2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Testing"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/ch.qos.logback.classic_1.0.7.v20121108-1250.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/ch.qos.logback.core_1.0.7.v20121108-1250.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.core.commands_3.9.300.v20190215-1957.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.core.jobs_3.10.300.v20190215-2048.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.core.resources_3.13.300.v20190218-2054.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.core.runtime_3.15.200.v20190301-1641.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.equinox.common_3.10.300.v20190218-2100.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.equinox.registry_3.8.300.v20190218-2100.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.jface_3.15.100.v20190222-1334.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.jface.text_3.15.100.v20190305-0811.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.osgi_3.13.300.v20190218-1622.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.swt.cocoa.macosx.x86_64_3.110.0.v20190305-0602.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.text_3.8.100.v20190306-1823.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.ui.editors_3.11.400.v20190218-1547.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.ui.ide_3.15.0.v20190301-1127.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.ui.workbench_3.113.0.v20190219-1432.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.ui.workbench.texteditor_3.11.300.v20190218-2126.jar"/>
+	<classpathentry kind="lib" path="/Users/gareth/Ziniki/Over/Tools/eclipselibs/org.eclipse.core.contenttype_3.7.300.v20190215-2048.jar"/>
+	<classpathentry kind="src" path="/utils"/>
+	<classpathentry kind="src" path="/LogConfig"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
