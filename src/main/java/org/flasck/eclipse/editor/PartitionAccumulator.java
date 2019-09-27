@@ -37,7 +37,6 @@ import org.flasck.flas.parsedForm.TypedPattern;
 import org.flasck.flas.parsedForm.UnresolvedOperator;
 import org.flasck.flas.parsedForm.UnresolvedVar;
 import org.flasck.flas.parsedForm.VarPattern;
-import org.flasck.flas.tokenizers.TemplateToken;
 import org.zinutils.reflection.Reflection;
 
 public class PartitionAccumulator {
@@ -182,13 +181,6 @@ public class PartitionAccumulator {
 		processEntry(eh.expr);
 	}
 	
-	public void processObject(TemplateToken tt) {
-		if (tt.type == TemplateToken.STRING) {
-			region(tt.location, "literal");
-		} else
-			System.out.println("Handle template token " + tt.type);
-	}
-
 	private void processFormatsEvents(TemplateFormatEvents td) {
 		processList(td.handlers);
 		processFormats(td);
@@ -236,7 +228,7 @@ public class PartitionAccumulator {
 
 	public void processObject(TypedPattern tp) {
 		region(tp.typeLocation, "typename");
-		region(tp.varLocation, "var");
+		region(tp.var.loc, "var");
 	}
 
 	public void processObject(VarPattern vp) {
