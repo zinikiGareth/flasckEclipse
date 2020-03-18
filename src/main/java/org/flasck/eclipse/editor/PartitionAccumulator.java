@@ -195,13 +195,13 @@ public class PartitionAccumulator {
 		region(ci.location(), "typename");
 		if (ci.varLocation != null)
 			region(ci.varLocation, "field");
-		processList(ci.methods);
+//		processList(ci.methods);
 	}
 	public void processObject(HandlerImplements hi) {
 		region(hi.kw, "keyword");
 		region(hi.typeLocation, "typename");
 		region(hi.location(), "typename");
-		processList(hi.methods);
+//		processList(hi.methods);
 	}
 
 	public void processObject(EventCaseDefn ecd) {
