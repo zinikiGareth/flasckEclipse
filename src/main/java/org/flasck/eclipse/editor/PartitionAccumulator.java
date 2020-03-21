@@ -13,7 +13,7 @@ import org.flasck.flas.parsedForm.CardDefinition;
 import org.flasck.flas.parsedForm.ContentExpr;
 import org.flasck.flas.parsedForm.ContentString;
 import org.flasck.flas.parsedForm.ContractDecl;
-import org.flasck.flas.parsedForm.ContractImplements;
+import org.flasck.flas.parsedForm.ImplementsContract;
 import org.flasck.flas.parsedForm.ContractMethodDecl;
 import org.flasck.flas.parsedForm.EventCaseDefn;
 import org.flasck.flas.parsedForm.EventHandler;
@@ -190,11 +190,9 @@ public class PartitionAccumulator {
 		processList(td.formats);
 	}
 
-	public void processObject(ContractImplements ci) {
+	public void processObject(ImplementsContract ci) {
 		region(ci.kw, "keyword");
 		region(ci.location(), "typename");
-		if (ci.varLocation != null)
-			region(ci.varLocation, "field");
 //		processList(ci.methods);
 	}
 	public void processObject(HandlerImplements hi) {
