@@ -6,32 +6,18 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
 import org.flasck.flas.blockForm.InputPosition;
 import org.flasck.flas.commonBase.ApplyExpr;
-import org.flasck.flas.commonBase.Locatable;
 import org.flasck.flas.commonBase.NumericLiteral;
 import org.flasck.flas.commonBase.StringLiteral;
 import org.flasck.flas.parsedForm.CardDefinition;
-import org.flasck.flas.parsedForm.ContentExpr;
-import org.flasck.flas.parsedForm.ContentString;
 import org.flasck.flas.parsedForm.ContractDecl;
-import org.flasck.flas.parsedForm.ImplementsContract;
 import org.flasck.flas.parsedForm.ContractMethodDecl;
-import org.flasck.flas.parsedForm.EventCaseDefn;
 import org.flasck.flas.parsedForm.EventHandler;
 import org.flasck.flas.parsedForm.FunctionCaseDefn;
 import org.flasck.flas.parsedForm.HandlerImplements;
-import org.flasck.flas.parsedForm.IScope;
-import org.flasck.flas.parsedForm.MethodCaseDefn;
-import org.flasck.flas.parsedForm.MethodMessage;
-import org.flasck.flas.parsedForm.Scope.ScopeEntry;
+import org.flasck.flas.parsedForm.ImplementsContract;
 import org.flasck.flas.parsedForm.StateDefinition;
 import org.flasck.flas.parsedForm.StructDefn;
 import org.flasck.flas.parsedForm.StructField;
-import org.flasck.flas.parsedForm.Template;
-import org.flasck.flas.parsedForm.TemplateCardReference;
-import org.flasck.flas.parsedForm.TemplateDiv;
-import org.flasck.flas.parsedForm.TemplateFormat;
-import org.flasck.flas.parsedForm.TemplateFormatEvents;
-import org.flasck.flas.parsedForm.TemplateList;
 import org.flasck.flas.parsedForm.TypeReference;
 import org.flasck.flas.parsedForm.TypedPattern;
 import org.flasck.flas.parsedForm.UnresolvedOperator;
@@ -51,6 +37,7 @@ public class PartitionAccumulator {
 		this.regionCollector = collector;
 	}
 
+	/*
 	public void processScope(IScope scope) {
 		if (scope == null)
 			return;
@@ -62,6 +49,7 @@ public class PartitionAccumulator {
 		
 		regionCollector.process();
 	}
+	*/
 
 	private void processEntry(Object o) {
 		if (o == null)
@@ -94,7 +82,7 @@ public class PartitionAccumulator {
 		region(card.kw, "keyword");
 		region(card.location(), "typename");
 		processEntry(card.state);
-		processList(card.templates);
+//		processList(card.templates);
 		processList(card.contracts);
 		processList(card.handlers);
 //		processScope(card.innerScope());
@@ -134,6 +122,7 @@ public class PartitionAccumulator {
 			processList(tr.polys());
 	}
 
+	/*
 	public void processObject(Template t) {
 		region(t.kw, "keyword");
 		region(t.location(), "field");
@@ -174,6 +163,7 @@ public class PartitionAccumulator {
 		region(((Locatable)ce.expr).location(), "field");
 		processFormatsEvents(ce);
 	}
+	*/
 	
 	public void processObject(EventHandler eh) {
 		region(eh.actionPos, "keyword");
@@ -181,6 +171,7 @@ public class PartitionAccumulator {
 		processEntry(eh.expr);
 	}
 	
+	/*
 	private void processFormatsEvents(TemplateFormatEvents td) {
 		processList(td.handlers);
 		processFormats(td);
@@ -189,6 +180,7 @@ public class PartitionAccumulator {
 	private void processFormats(TemplateFormat td) {
 		processList(td.formats);
 	}
+	*/
 
 	public void processObject(ImplementsContract ci) {
 		region(ci.kw, "keyword");
@@ -202,6 +194,7 @@ public class PartitionAccumulator {
 //		processList(hi.methods);
 	}
 
+	/*
 	public void processObject(EventCaseDefn ecd) {
 		region(ecd.kw, "keyword");
 		region(ecd.location(), "methodname");
@@ -216,6 +209,7 @@ public class PartitionAccumulator {
 		processList(q.messages);
 		processScope(q.innerScope());
 	}
+	*/
 
 	public void processObject(FunctionCaseDefn q) {
 		region(q.location(), "methodname");
@@ -233,6 +227,7 @@ public class PartitionAccumulator {
 		region(vp.location(), "var");
 	}
 
+	/*
 	public void processObject(MethodMessage mm) {
 		region(mm.kw, "symbol");
 		if (mm.slot != null) {
@@ -242,6 +237,7 @@ public class PartitionAccumulator {
 		}
 		processEntry(mm.expr);
 	}
+	*/
 	
 	public void processObject(ApplyExpr ae) {
 		if (tryHerdingDots(ae)) {
