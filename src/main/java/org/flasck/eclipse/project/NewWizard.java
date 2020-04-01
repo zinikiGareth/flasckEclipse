@@ -34,7 +34,6 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.flasck.eclipse.Activator;
 import org.zinutils.xml.XML;
 
-@SuppressWarnings("restriction")
 public class NewWizard extends BasicNewResourceWizard {
 	private IProject newProject;
 	private WizardNewProjectCreationPage mainPage;
